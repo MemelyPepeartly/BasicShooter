@@ -111,7 +111,7 @@ function setStats() {
 }
 
 /**
- * Shows the end stat window
+ * Shows the end stat div
  */
 function showEndStats()
 {
@@ -131,7 +131,7 @@ function showEndStats()
 }
 
 /**
- * Clears stats
+ * Clears game stats (not end stats)
  */
 function clearStats() {
     console.log("Clearing stats");
@@ -153,7 +153,7 @@ function clearStats() {
 }
 
 /**
- * Sets common style
+ * Sets common styling
  */
 function setStyle() {
     context.shadowColor = "#d53";

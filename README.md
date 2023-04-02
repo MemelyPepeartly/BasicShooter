@@ -1,8 +1,8 @@
 # BasicShooter
+A small shooter game in which the user can set how many enemies they would like to spawn. 
+The player is given a minute to shoot down enemies, at the end of which, stats will be displayed.
 
-A small shooter game in which the user can set how many enemies they would like to spawn.
-
-The player is given a minute to shoot down enemies, at the end of which, stats will be displayed
+The W, S, A, D keys are used to move the main square, and spacebar is used to shoot.
 
 ## Stats
 Stats displayed are total enemies destroyed, shots taken, shots missed, and overall accuracy
