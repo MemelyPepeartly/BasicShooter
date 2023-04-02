@@ -4,11 +4,13 @@ import Sprite from "./Sprite.js"
  * Player object
  */
 export default class Player extends Sprite {
-    constructor(x, y)
+    constructor(x, y, projectileController)
     {
         super();
         this.x = x;
         this.y = y;
+
+        this.projectileController = projectileController;
 
         this.width = 50;
         this.height = 50;
@@ -23,7 +25,7 @@ export default class Player extends Sprite {
         ctx.strokeStyle = "white";
         ctx.strokeRect(this.x, this.y, this.width, this.height);
         
-        ctx.fillStyle = "black"
+        ctx.fillStyle = "black";
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
         this.shoot();
@@ -47,6 +49,13 @@ export default class Player extends Sprite {
     shoot() {
         if(this.shootPressed) {
             console.log("shoot");
+            const speed = 5;
+            const delay = 7;
+            const damage = 1;
+            const projectileX = this.x + this.width/2
+            const projectileY = this.y;
+            
+            this.projectileController.shoot(projectileX, projectileY, speed, damage, delay)
         }
     }
 
