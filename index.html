@@ -7,23 +7,79 @@
     <title>Basic Shooter</title>
     <style>
         body {
+            height: 100vh;
+            background: linear-gradient(
+                0deg,
+                rgb(111, 130, 194) 0%,
+                rgb(161, 49, 161)
+            )
+        }
+        #contentBody {
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 0;
             margin-top: 10px;
-            height: 100vh;
-            background: linear-gradient(
-                0deg,
-                rgb(17, 51, 161) 0%,
-                rgb(136, 34, 195)
-            )
+        }
+        #controlsDiv {
+            display: block;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+        .control {
+            display: block;
+            margin-top: 10px;
+        }
+        .statsDiv {
+            color: white;
+        }
+        .stat
+        {
+            display: block;
+        }
+        #endStatsDiv {
+            display: none;
+            border: white; 
+            border-style: solid; 
+            padding: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
     </style>
     <script src="./src/index.js" type="module"></script>
 </head>
 <body>
-    <h1>Square Wave</h1>
-    <canvas id="game"></canvas>
+    <div id="contentBody">
+        <h1 style="color: white;">Square Wave</h1>
+        <div class="statsDiv">
+            <span>Time Remaining:</span> <span id="timeRemaining"></span>
+        </div>
+        <div class="statsDiv">
+            <span>Total Enemies: </span> <span id="totalEnemies"></span>
+        </div>
+        <div class="statsDiv">
+            <span>Enemies Destroyed: </span> <span id="totalEnemiesDestroyed"></span>
+        </div>
+        
+        <div class="statsDiv" id="endStatsDiv">
+            <span class="stat">Time is up!</span>
+            <span class="stat" id="endStatTotalDestroyed"></span>
+            <span class="stat" id="endStatTotalShots"></span>
+            <span class="stat" id="endStatTotalMissed"></span>
+            <span class="stat" id="endStatTotalAccuracy"></span>
+
+        </div>
+        
+        <canvas id="game"></canvas>
+    </div>
+
+    <div id="controlsDiv">
+        <input id="startBtn" class="control" type="button" value="Start">
+        <input id="pauseBtn" class="control" type="button" value="Pause">
+        <input id="restartBtn" class="control" type="button" value="Restart">
+        <br>
+        <span>Number of enemies to spawn</span>
+        <input id="enemiesTxt" class="control" type="text" value="10"> 
+    </div>
 </body>
 </html>
