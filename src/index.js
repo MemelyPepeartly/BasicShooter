@@ -19,14 +19,28 @@ var destroyedEnemies = 0;
 var spawnInterval = 5;
 var enemies = [];
 
-var startIntervalNum = undefined;
-var spawnIntervalNum = undefined;
-var timerIntervalNum = undefined;
+var loops = {
+    loopList : new Set(),
+
+    // makes another interval
+    make(...args) {
+        var newInterval = setInterval(...args);
+        this.loopList.add(newInterval);
+
+        return newInterval;
+    },
+
+    // Clears them all
+    clearAll() {
+        this.loopList.clear();
+    }
+}
 var secondsCount = 0;
 var started = false;
+var paused = false;
 
 const projectileController = new ProjectileController(canvas);
-const player = new Player(
+var player = new Player(
     canvas.width/2,
     canvas.height/1.5,
     projectileController
@@ -36,30 +50,32 @@ const player = new Player(
  * Main gameplay loop
  */
 function loop() {
-    setStyle();
-    setStats();
-
-    context.fillStyle = "black";
-    context.fillRect(0,0,canvas.width,canvas.height);
-
-    projectileController.draw(context);
-    player.draw(context);
-
-    enemies.forEach(enemy => {
-        if(projectileController.collideWith(enemy)){
-            enemies.splice(enemies.indexOf(enemy), 1);
-            destroyedEnemies++;
+    if(!paused){
+        setStyle();
+        setStats();
+    
+        context.fillStyle = "black";
+        context.fillRect(0,0,canvas.width,canvas.height);
+    
+        projectileController.draw(context);
+        player.draw(context);
+    
+        enemies.forEach(enemy => {
+            if(projectileController.collideWith(enemy)){
+                enemies.splice(enemies.indexOf(enemy), 1);
+                destroyedEnemies++;
+            }
+            else {
+                enemy.draw(context);
+            }
+        });
+    
+        if(destroyedEnemies == totalEnemies)
+        {
+            showEndStats();
+            // Stops the counter here. Will not incorporate any shots after last enemy into final stats
+            pause();
         }
-        else {
-            enemy.draw(context);
-        }
-    });
-
-    if(destroyedEnemies == totalEnemies)
-    {
-        showEndStats();
-        // Stops the counter here. Will not incorporate any shots after last enemy into final stats
-        pause();
     }
 }
 
@@ -67,20 +83,23 @@ function loop() {
  * Enemy spawn loop
  */
 function enemySpawn() {
-    if(spawnedEnemies < totalEnemies)
+    if(!paused)
     {
-        var numberToSpawn = spawnInterval
-        if(spawnedEnemies + spawnInterval > totalEnemies)
+        if(spawnedEnemies < totalEnemies)
         {
-            // If the next interval is more than the total if the enemies were added
-            // Then get the difference and use that as the last wave
-            numberToSpawn =  totalEnemies - spawnedEnemies
+            var numberToSpawn = spawnInterval
+            if(spawnedEnemies + spawnInterval > totalEnemies)
+            {
+                // If the next interval is more than the total if the enemies were added
+                // Then get the difference and use that as the last wave
+                numberToSpawn =  totalEnemies - spawnedEnemies
+            }
+    
+            var wave = new Array(numberToSpawn).fill().map(() => (new Enemy(getRandomValue(0, canvas.width-50) + 50, -canvas.height, "red", 1)))
+            enemies = enemies.concat(wave);
+    
+            spawnedEnemies += spawnInterval;
         }
-
-        var wave = new Array(numberToSpawn).fill().map(() => (new Enemy(getRandomValue(0, canvas.width-50) + 50, -canvas.height, "red", 1)))
-        enemies = enemies.concat(wave);
-
-        spawnedEnemies += spawnInterval;
     }
 }
 
@@ -88,18 +107,21 @@ function enemySpawn() {
  * Timer loop
  */
 function timerStart() {
-    if(secondsCount < 60)
+    if(!paused)
     {
-        document.getElementById("timeRemaining").textContent = 60 - secondsCount;
-    }
+        if(secondsCount < 60)
+        {
+            document.getElementById("timeRemaining").textContent = 60 - secondsCount;
+        }
+        
     
-
-    // If reached the end of game, display stats
-    if(secondsCount >= 60){
-        showEndStats();
-        pause();
+        // If reached the end of game, display stats
+        if(secondsCount >= 60){
+            showEndStats();
+            pause();
+        }
+        secondsCount++;
     }
-    secondsCount++;
 }
 
 /**
@@ -139,10 +161,6 @@ function clearStats() {
     spawnedEnemies = 0;
     destroyedEnemies = 0;
     enemies = [];
-
-    startIntervalNum = undefined;
-    spawnIntervalNum = undefined;
-    timerIntervalNum = undefined;
     secondsCount = 0;
     started = false;
 
@@ -172,11 +190,27 @@ function start()
         console.log("Starting");
         started = true;
 
+        document.getElementById("endStatsDiv").style.display = "none";
+        projectileController.clearProjectileStats();
         totalEnemies = document.getElementById("enemiesTxt").value;
-    
-        startIntervalNum = setInterval(loop, 1000 / 60)
-        spawnIntervalNum = setInterval(enemySpawn, 500)
-        timerIntervalNum = setInterval(timerStart, 1000)
+
+        player = new Player(
+            canvas.width/2,
+            canvas.height/1.5,
+            projectileController
+            );
+        if(paused)
+        {
+            pause();
+        }
+        
+        // Check if loops already added to the set
+        if(loops.loopList.size != 3)
+        {
+            loops.make(loop, 1000 / 60);
+            loops.make(enemySpawn, 500);
+            loops.make(timerStart, 1000);
+        }
     }
     else
     {
@@ -185,22 +219,21 @@ function start()
 }
 
 /**
- * Pauses all of the intervals running
+ * Pauses all of the intervals running by removing them
  */
 function pause()
 {
-    if(startIntervalNum)
+    if(!paused)
     {
-        clearInterval(startIntervalNum);
+        paused = true;
+        document.getElementById("pauseBtn").value = "Unpause";
     }
-    if(spawnIntervalNum)
+    else
     {
-        clearInterval(spawnIntervalNum);
+        paused = false;
+        document.getElementById("pauseBtn").value = "Pause";
     }
-    if(timerIntervalNum)
-    {
-        clearInterval(timerIntervalNum);
-    }
+    
 }
 
 /**
@@ -208,32 +241,21 @@ function pause()
  */
 function restart()
 {
+    document.getElementById("endStatsDiv").style.display = "none";
+    projectileController.clearProjectileStats();
     clearStats();
-    if(timerIntervalNum)
-    {
-        clearInterval(timerIntervalNum);
-        secondsCount = 0;
-    }
-    if(spawnIntervalNum)
-    {
-        clearInterval(spawnIntervalNum);
-    }
-    if(startIntervalNum)
-    {
-        clearInterval(startIntervalNum);
-        context.clearRect(0, 0, canvas.width, canvas.height);
 
-        document.getElementById("endStatsDiv").style.display = "none";
-        projectileController.clearProjectileStats();
-        
-        setStyle();
-        context.fillStyle = "black";
-        context.fillRect(0,0,canvas.width,canvas.height);
-        enemies = [];
+    secondsCount = 0;
 
-        started = false;
-        start();
-    }
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    setStyle();
+
+    context.fillStyle = "black";
+    context.fillRect(0,0,canvas.width,canvas.height);
+    enemies = [];
+
+    started = false;
+    start();
 }
 
 

@@ -55,5 +55,6 @@ export default class ProjectileController {
     {
         this.missedShots = 0;
         this.projectileCount = 0;
+        this.projectiles = [];
     }
 }
