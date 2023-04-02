@@ -15,3 +15,6 @@ you are using space to click the button and restart.
 The game does not take into account speed at which the enemies come on screen, therefore, it is possible to add more enemies than the 
 game will be able to spawn in within the given time limit. 
 
+# Troubleshooting
+If pushing start doesn't create the game canvas, and there is a CORS error in the console, it is because a local web server is needed to run it with the scripts.
+Simplest way to run is to install [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for Visual Studio Code.
