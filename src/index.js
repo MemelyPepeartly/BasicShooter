@@ -219,7 +219,7 @@ function start()
 }
 
 /**
- * Pauses all of the intervals running by removing them
+ * Toggles the paused variable
  */
 function pause()
 {
