@@ -3,6 +3,9 @@ import Projectile from "../objects/Projectile.js";
 export default class ProjectileController {
     projectiles = [];
     timerTillNextProjectile = 0;
+
+    projectileCount = 0;
+    missedShots = 0;
     contructor(canvas)
     {
         this.canvas = canvas;
@@ -15,6 +18,8 @@ export default class ProjectileController {
             {
                 const index = this.projectiles.indexOf(projectile);
                 this.projectiles.splice(index, 1);
+
+                this.missedShots++;
             }
             projectile.draw(ctx);
         })
@@ -24,6 +29,7 @@ export default class ProjectileController {
         {
             this.projectiles.push(new Projectile(x, y, speed, damage));
             this.timerTillNextProjectile = delay;
+            this.projectileCount++;
         }
         this.timerTillNextProjectile--;
     }
@@ -31,5 +37,23 @@ export default class ProjectileController {
     isProjectileOffScreen(projectile)
     {
         return projectile.y <= -projectile.height;
+    }
+
+    collideWith(sprite)
+    {
+        return this.projectiles.some(projectile => {
+            if(projectile.collideWith(sprite)){
+                this.projectiles.splice(this.projectiles.indexOf(projectile), 1);
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    clearProjectileStats()
+    {
+        this.missedShots = 0;
+        this.projectileCount = 0;
     }
 }
