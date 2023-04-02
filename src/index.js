@@ -50,7 +50,9 @@ var player = new Player(
  * Main gameplay loop
  */
 function loop() {
-    if(!paused){
+    if(paused){
+        return
+    }
         setStyle();
         setStats();
     
@@ -76,15 +78,15 @@ function loop() {
             // Stops the counter here. Will not incorporate any shots after last enemy into final stats
             pause();
         }
-    }
 }
 
 /**
  * Enemy spawn loop
  */
 function enemySpawn() {
-    if(!paused)
-    {
+    if(paused) {
+        return
+    }
         if(spawnedEnemies < totalEnemies)
         {
             var numberToSpawn = spawnInterval
@@ -100,15 +102,15 @@ function enemySpawn() {
     
             spawnedEnemies += spawnInterval;
         }
-    }
 }
 
 /**
  * Timer loop
  */
 function timerStart() {
-    if(!paused)
-    {
+    if(paused) {
+        return
+    }
         if(secondsCount < 60)
         {
             document.getElementById("timeRemaining").textContent = 60 - secondsCount;
@@ -121,7 +123,6 @@ function timerStart() {
             pause();
         }
         secondsCount++;
-    }
 }
 
 /**
